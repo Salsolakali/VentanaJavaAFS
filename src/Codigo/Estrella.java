@@ -15,8 +15,8 @@ import java.awt.Polygon;
  */
 public class Estrella extends Forma {
     
-    public Estrella(int _posX, int _posY, Color _color, boolean _relleno) {
-        super(_posX, _posY, new int [32], new int [32], _color, _relleno, 32);
+    public Estrella(int _posX, int _posY, Color _color, boolean _relleno, int _puntasEstrella) {
+        super(_posX, _posY, new int [_puntasEstrella], new int [_puntasEstrella], _color, _relleno, _puntasEstrella);
         
     }
     

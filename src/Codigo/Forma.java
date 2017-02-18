@@ -41,9 +41,7 @@ public class Forma extends Polygon {
         
     }
 
-    Forma(int x, int y, int numLados, int numLados0, Color colorSeleccionado, boolean relleno, int numLados1) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    
     public void Dibujate(Graphics2D g2,int posX, int posY){
               
         int radio = this.y - posY;
