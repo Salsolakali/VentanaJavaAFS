@@ -10,7 +10,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.sql.DriverManager;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -30,25 +36,37 @@ public class VentanaPaint extends javax.swing.JFrame {
     
     boolean relleno = true;
     boolean lapiz = true;
-    boolean goma =false;
+    
     
     Forma miForma;
     Ellipse2D.Double miLapiz;
-    
+ 
     
     int numLados = 0;
     int ladosPoligono = 3;
     int puntasEstrella = 6;
+    int radioLapiz = 5;
+    
     
     //Este es el constructor
     public VentanaPaint() {
         initComponents();
+        
         inicializaBuffers();
+        
+        //Dialogo del color picker
         jDialog1.setSize(700, 450);
-        jDialog2.setSize(200, 200);
-        jDialog3.setSize(200, 200);
-        //guardarImagen.setSize(700, 450);
+        
+        //El resto de cuadros los inicializo en una posición mas o menos centrica
+        jDialog2.setBounds(200, 100, 200, 200);
+        jDialog3.setBounds(200, 100, 200, 200);
+        jDialog4.setBounds(200, 100, 200, 200);
+        jDialog5.setBounds(200, 100, 200, 200);
+        jDialog6.setSize(700, 450);
+        jDialog7.setBounds(200, 100, 270, 150);
+        
     }
+    
     private void inicializaBuffers(){
         //Cojo lo que tiene el buffer y lo pinto en el JPanel
         lienzoGraphics =(Graphics2D) lienzo.getGraphics();
@@ -84,6 +102,9 @@ public class VentanaPaint extends javax.swing.JFrame {
         //Dibujo el buffer en la coordenada 0,0 del lienzo
         lienzoGraphics.drawImage(buffer, 0, 0, null);
     }
+    
+    
+   
     /**
      * Creates new form VentanaPaint
      */
@@ -118,6 +139,25 @@ public class VentanaPaint extends javax.swing.JFrame {
         jButton25 = new javax.swing.JButton();
         jSlider2 = new javax.swing.JSlider();
         jLabel4 = new javax.swing.JLabel();
+        jDialog4 = new javax.swing.JDialog();
+        jSlider3 = new javax.swing.JSlider();
+        jLabel5 = new javax.swing.JLabel();
+        jButton27 = new javax.swing.JButton();
+        jButton28 = new javax.swing.JButton();
+        grosorPuntero = new javax.swing.JLabel();
+        jDialog5 = new javax.swing.JDialog();
+        jSlider4 = new javax.swing.JSlider();
+        jLabel6 = new javax.swing.JLabel();
+        jButton30 = new javax.swing.JButton();
+        jButton31 = new javax.swing.JButton();
+        grosorPuntero1 = new javax.swing.JLabel();
+        jDialog6 = new javax.swing.JDialog();
+        jFileChooser1 = new javax.swing.JFileChooser();
+        jDialog7 = new javax.swing.JDialog();
+        jLabel7 = new javax.swing.JLabel();
+        jButton32 = new javax.swing.JButton();
+        jButton33 = new javax.swing.JButton();
+        jButton34 = new javax.swing.JButton();
         lienzo = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -138,6 +178,14 @@ public class VentanaPaint extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jButton19 = new javax.swing.JButton();
         jButton26 = new javax.swing.JButton();
+        jButton29 = new javax.swing.JButton();
+        jButton35 = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        Archivo = new javax.swing.JMenu();
+        Guardar = new javax.swing.JMenuItem();
+        GuardarComo = new javax.swing.JMenuItem();
+        Salir = new javax.swing.JMenuItem();
+        Formas = new javax.swing.JMenu();
 
         jButton17.setText("Aceptar");
         jButton17.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -180,7 +228,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                 .addGap(0, 115, Short.MAX_VALUE))
         );
 
-        jLabel1.setText("Numero de puntas");
+        jLabel1.setText("Numero de lados");
 
         jCheckBox1.setText("Relleno");
 
@@ -271,6 +319,11 @@ public class VentanaPaint extends javax.swing.JFrame {
         jLabel3.setText("Numero de puntas");
 
         jCheckBox2.setText("Relleno");
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
 
         jButton23.setText("Aceptar");
         jButton23.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -300,6 +353,7 @@ public class VentanaPaint extends javax.swing.JFrame {
 
         jSlider2.setMaximum(50);
         jSlider2.setMinimum(6);
+        jSlider2.setValue(6);
         jSlider2.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jSlider2MouseDragged(evt);
@@ -320,13 +374,14 @@ public class VentanaPaint extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton24))
                     .addGroup(jDialog3Layout.createSequentialGroup()
-                        .addGroup(jDialog3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jCheckBox2))
+                        .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jDialog3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jButton25)))
+                    .addGroup(jDialog3Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(jCheckBox2))
                     .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(469, Short.MAX_VALUE))
         );
@@ -339,7 +394,7 @@ public class VentanaPaint extends javax.swing.JFrame {
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSlider2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jDialog3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox2)
                     .addComponent(jButton25))
@@ -347,7 +402,220 @@ public class VentanaPaint extends javax.swing.JFrame {
                 .addGroup(jDialog3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton24)
                     .addComponent(jButton23))
-                .addContainerGap(260, Short.MAX_VALUE))
+                .addContainerGap(254, Short.MAX_VALUE))
+        );
+
+        jSlider3.setMaximum(80);
+        jSlider3.setMinimum(5);
+        jSlider3.setValue(5);
+        jSlider3.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jSlider3MouseDragged(evt);
+            }
+        });
+
+        jLabel5.setText("Grosor del lápiz");
+
+        jButton27.setText("Aceptar");
+        jButton27.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton27MousePressed(evt);
+            }
+        });
+
+        jButton28.setText("Cancelar");
+        jButton28.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton28MousePressed(evt);
+            }
+        });
+        jButton28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton28ActionPerformed(evt);
+            }
+        });
+
+        grosorPuntero.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        grosorPuntero.setText("Fino");
+
+        javax.swing.GroupLayout jDialog4Layout = new javax.swing.GroupLayout(jDialog4.getContentPane());
+        jDialog4.getContentPane().setLayout(jDialog4Layout);
+        jDialog4Layout.setHorizontalGroup(
+            jDialog4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog4Layout.createSequentialGroup()
+                .addGroup(jDialog4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDialog4Layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addComponent(jLabel5))
+                    .addGroup(jDialog4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSlider3, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jDialog4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton27)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton28)))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jDialog4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(grosorPuntero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jDialog4Layout.setVerticalGroup(
+            jDialog4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSlider3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(grosorPuntero, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jDialog4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton27)
+                    .addComponent(jButton28))
+                .addContainerGap(77, Short.MAX_VALUE))
+        );
+
+        jSlider4.setMaximum(80);
+        jSlider4.setMinimum(5);
+        jSlider4.setValue(5);
+        jSlider4.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jSlider4MouseDragged(evt);
+            }
+        });
+
+        jLabel6.setText("Grosor de la goma");
+
+        jButton30.setText("Aceptar");
+        jButton30.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton30MousePressed(evt);
+            }
+        });
+
+        jButton31.setText("Cancelar");
+        jButton31.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton31MousePressed(evt);
+            }
+        });
+        jButton31.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton31ActionPerformed(evt);
+            }
+        });
+
+        grosorPuntero1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        grosorPuntero1.setText("Fino");
+
+        javax.swing.GroupLayout jDialog5Layout = new javax.swing.GroupLayout(jDialog5.getContentPane());
+        jDialog5.getContentPane().setLayout(jDialog5Layout);
+        jDialog5Layout.setHorizontalGroup(
+            jDialog5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog5Layout.createSequentialGroup()
+                .addGroup(jDialog5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jDialog5Layout.createSequentialGroup()
+                        .addGap(54, 54, 54)
+                        .addComponent(jLabel6))
+                    .addGroup(jDialog5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jSlider4, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jDialog5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jButton30)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton31)))
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addGroup(jDialog5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(grosorPuntero1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jDialog5Layout.setVerticalGroup(
+            jDialog5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSlider4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(grosorPuntero1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jDialog5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton30)
+                    .addComponent(jButton31))
+                .addContainerGap(77, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jDialog6Layout = new javax.swing.GroupLayout(jDialog6.getContentPane());
+        jDialog6.getContentPane().setLayout(jDialog6Layout);
+        jDialog6Layout.setHorizontalGroup(
+            jDialog6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog6Layout.createSequentialGroup()
+                .addComponent(jFileChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jDialog6Layout.setVerticalGroup(
+            jDialog6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog6Layout.createSequentialGroup()
+                .addComponent(jFileChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        jLabel7.setText("¿Guardar los cambios?");
+
+        jButton32.setText("Aceptar");
+        jButton32.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton32MousePressed(evt);
+            }
+        });
+        jButton32.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton32ActionPerformed(evt);
+            }
+        });
+
+        jButton33.setText("Cancelar");
+        jButton33.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton33MousePressed(evt);
+            }
+        });
+
+        jButton34.setText("Salir");
+        jButton34.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton34MousePressed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jDialog7Layout = new javax.swing.GroupLayout(jDialog7.getContentPane());
+        jDialog7.getContentPane().setLayout(jDialog7Layout);
+        jDialog7Layout.setHorizontalGroup(
+            jDialog7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog7Layout.createSequentialGroup()
+                .addGroup(jDialog7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel7)
+                    .addGroup(jDialog7Layout.createSequentialGroup()
+                        .addComponent(jButton32)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton33)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton34)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jDialog7Layout.setVerticalGroup(
+            jDialog7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog7Layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jDialog7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton32)
+                    .addComponent(jButton33)
+                    .addComponent(jButton34))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -374,7 +642,7 @@ public class VentanaPaint extends javax.swing.JFrame {
         );
         lienzoLayout.setVerticalGroup(
             lienzoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 491, Short.MAX_VALUE)
+            .addGap(0, 456, Short.MAX_VALUE)
         );
 
         jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circuloRelleno.png"))); // NOI18N
@@ -570,6 +838,71 @@ public class VentanaPaint extends javax.swing.JFrame {
             }
         });
 
+        jButton29.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/goma.jpg"))); // NOI18N
+        jButton29.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton29MousePressed(evt);
+            }
+        });
+        jButton29.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton29ActionPerformed(evt);
+            }
+        });
+
+        jButton35.setText("Triangulo");
+        jButton35.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jButton35MousePressed(evt);
+            }
+        });
+
+        Archivo.setText("Archivo");
+
+        Guardar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
+        Guardar.setText("Guardar");
+        Guardar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                GuardarMousePressed(evt);
+            }
+        });
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarActionPerformed(evt);
+            }
+        });
+        Archivo.add(Guardar);
+
+        GuardarComo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        GuardarComo.setText("Guardar como ...");
+        GuardarComo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                GuardarComoMousePressed(evt);
+            }
+        });
+        GuardarComo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarComoActionPerformed(evt);
+            }
+        });
+        Archivo.add(GuardarComo);
+
+        Salir.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
+        Salir.setText("Salir");
+        Salir.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                SalirMousePressed(evt);
+            }
+        });
+        Archivo.add(Salir);
+
+        jMenuBar1.add(Archivo);
+
+        Formas.setText("Formas");
+        jMenuBar1.add(Formas);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -592,8 +925,12 @@ public class VentanaPaint extends javax.swing.JFrame {
                 .addGap(13, 13, 13)
                 .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
                 .addComponent(jButton19)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -620,38 +957,39 @@ public class VentanaPaint extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jButton16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton16)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(10, 10, 10)
-                                .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 2, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lienzo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton11, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton19, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButton35)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lienzo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -678,12 +1016,12 @@ public class VentanaPaint extends javax.swing.JFrame {
             //Si el lapiz está activo, entro aqui. Ponerlo en una clase aparte cuando tenga tiempo
             lienzoGraphics.drawImage(buffer, 0, 0, null);
            
-            miLapiz = new Ellipse2D.Double(evt.getX(), evt.getY(), 5, 5);
+            miLapiz = new Ellipse2D.Double(evt.getX(), evt.getY(), radioLapiz, radioLapiz);
             Graphics2D g2 = (Graphics2D) buffer.getGraphics();
             g2.setColor(colorSeleccionado);
-            g2.fill(miLapiz);
+            g2.fill(miLapiz);      
+           
             
-                
         }
         else{
             
@@ -700,11 +1038,9 @@ public class VentanaPaint extends javax.swing.JFrame {
 
     private void lienzoMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lienzoMouseReleased
         if(lapiz){
-            //miLapiz = new Ellipse2D.Double(evt.getX(), evt.getY(), 10, 10);
             Graphics2D g2 = (Graphics2D) buffer2.getGraphics();
             
-            
-            //Esta linea es la puta clave
+            //Esta linea es la puta clave para que no se me sobreecriba el buffer 2 sobre el 1
             g2.drawImage(buffer, 0,0, null);
             g2.setColor(colorSeleccionado);
             g2.fill(miLapiz);
@@ -722,6 +1058,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MousePressed
         //Circulo vacio
         numLados = 100;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = false;
         lapiz = false;
     }//GEN-LAST:event_jButton2MousePressed
@@ -733,6 +1071,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton4MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MousePressed
         //Cuadrado vacio
         numLados = 4;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = false;
         lapiz = false;
     }//GEN-LAST:event_jButton4MousePressed
@@ -744,6 +1084,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton6MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton6MousePressed
         //Triangulo vacio
         numLados = 3;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = false;
         lapiz = false;
     }//GEN-LAST:event_jButton6MousePressed
@@ -753,7 +1095,11 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton7MousePressed
+        //Boton del lapiz
         lapiz = true;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
+        jDialog4.setVisible(true);
     }//GEN-LAST:event_jButton7MousePressed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
@@ -767,6 +1113,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton5MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton5MousePressed
         //Triangulo relleno
         numLados = 3;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = true;
         lapiz = false;
     }//GEN-LAST:event_jButton5MousePressed
@@ -778,6 +1126,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton3MousePressed
         //Cuadrado relleno
         numLados = 4;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = true;
         lapiz = false;
     }//GEN-LAST:event_jButton3MousePressed
@@ -789,6 +1139,8 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MousePressed
         //Circulo relleno
         numLados = 100;
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         relleno = true;
         lapiz = false;
     }//GEN-LAST:event_jButton1MousePressed
@@ -862,10 +1214,12 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton16MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton16MousePressed
+        //Boton mas color
         jDialog1.setVisible(true);
     }//GEN-LAST:event_jButton16MousePressed
 
     private void jButton17MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton17MousePressed
+        //Boton aceptar del color picker
         colorSeleccionado = jColorChooser1.getColor();
         jTextField1.setBackground(colorSeleccionado);
         jDialog1.setVisible(false);
@@ -876,6 +1230,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton18MousePressed
 
     private void jButton19MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton19MousePressed
+        //Boton cancelar del color picker
         jDialog2.setVisible(true);
     }//GEN-LAST:event_jButton19MousePressed
 
@@ -894,6 +1249,8 @@ public class VentanaPaint extends javax.swing.JFrame {
         else{
             relleno = false;
         }
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
         //Desactivo el lapiz
         lapiz = false;
         
@@ -919,7 +1276,7 @@ public class VentanaPaint extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton22MousePressed
 
     private void jButton23MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton23MousePressed
-        //Aceptar de la estrella
+        //Boton aceptar de la estrella
         //Ha de ir a la posicion 12 del swich que me va a poligono regular
         numLados = 12;
         //Checkbox del relleno
@@ -932,11 +1289,14 @@ public class VentanaPaint extends javax.swing.JFrame {
         //Desactivo el lapiz
         lapiz = false;
         
+        //Por si acabara de borrar, cojo el ultimo color seleccionado antes del blanco de la goma
+        colorSeleccionado = jTextField1.getBackground();
+        
         jDialog3.setVisible(false);
     }//GEN-LAST:event_jButton23MousePressed
 
     private void jButton24MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton24MousePressed
-        //Cancelar de la estrella
+        //Boton cancelar de la estrella
         jDialog3.setVisible(false);
     }//GEN-LAST:event_jButton24MousePressed
 
@@ -963,6 +1323,7 @@ public class VentanaPaint extends javax.swing.JFrame {
        //Boton de la estrella
         jDialog3.setVisible(true);
         
+        
     }//GEN-LAST:event_jButton26MousePressed
 
     private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
@@ -972,6 +1333,210 @@ public class VentanaPaint extends javax.swing.JFrame {
     private void jButton22ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton22ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton22ActionPerformed
+
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+    private void jSlider3MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSlider3MouseDragged
+    radioLapiz = jSlider3.getValue();
+    if(radioLapiz<=15){
+        grosorPuntero.setText("Fino");
+    }
+    else if (radioLapiz <=30){
+        grosorPuntero.setText("Medio");
+    }
+    else if (radioLapiz <=50){
+        grosorPuntero.setText("Grueso");
+    }
+    else if (radioLapiz <=100){
+        grosorPuntero.setText("Muy grueso");
+    }
+       
+    }//GEN-LAST:event_jSlider3MouseDragged
+
+    private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton28ActionPerformed
+
+    private void jButton27MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton27MousePressed
+        //Boton aceptar del grosor del lapiz
+        radioLapiz = jSlider3.getValue();
+        jDialog4.setVisible(false);
+        
+    }//GEN-LAST:event_jButton27MousePressed
+
+    private void jButton28MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton28MousePressed
+        //Boton cancelar del grosor del lapiz
+        jDialog4.setVisible(false);
+    }//GEN-LAST:event_jButton28MousePressed
+
+    private void jButton29MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton29MousePressed
+        //Boton de la goma. Me la gestiono como un lapiz que pinta blanco
+        lapiz= true;
+        colorSeleccionado = Color.WHITE;
+        jDialog5.setVisible(true);
+        
+    }//GEN-LAST:event_jButton29MousePressed
+
+    private void jButton29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton29ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton29ActionPerformed
+
+    private void jSlider4MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSlider4MouseDragged
+    //PAra el grosor de la goma, lo hago igual que el lapiz
+        radioLapiz = jSlider3.getValue();
+    if(radioLapiz<=15){
+        grosorPuntero.setText("Fino");
+    }
+    else if (radioLapiz <=30){
+        grosorPuntero.setText("Medio");
+    }
+    else if (radioLapiz <=50){
+        grosorPuntero.setText("Grueso");
+    }
+    else if (radioLapiz <=100){
+        grosorPuntero.setText("Muy grueso");
+    }
+    }//GEN-LAST:event_jSlider4MouseDragged
+
+    private void jButton30MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton30MousePressed
+        //Boton aceptar de la goma
+        radioLapiz = jSlider4.getValue();
+        jDialog5.setVisible(false);
+    }//GEN-LAST:event_jButton30MousePressed
+
+    private void jButton31MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton31MousePressed
+        //Boton cancelar de la goma
+        jDialog5.setVisible(false);
+    }//GEN-LAST:event_jButton31MousePressed
+
+    private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton31ActionPerformed
+
+    private void GuardarComoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarComoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GuardarComoActionPerformed
+
+    private void GuardarComoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarComoMousePressed
+      
+    //Para guardar el archivo
+        
+        int seleccion = jFileChooser1.showSaveDialog(this);
+        if(seleccion == JFileChooser.APPROVE_OPTION){
+            //Si entro aqui es porque el usuario le ha dado a aceptar
+            
+            File fichero = jFileChooser1.getSelectedFile();
+            
+            //Cojo el nombre del archivo
+            String nombre = fichero.getName();
+           
+            //Busco la extension del archivo
+            String extension = nombre.substring(nombre.lastIndexOf('.')+1, nombre.length());
+            if(extension.equalsIgnoreCase("jpg")||extension.equalsIgnoreCase("png")){
+                try{
+                    //Aqui le digo que escriba el buffer con la extension que tenga
+                    ImageIO.write(buffer, extension, fichero);
+                }
+                catch(IOException e){ 
+                }
+            }
+        }
+        if(seleccion == JFileChooser.CANCEL_OPTION){
+            //si entro aqui es porque el usuario le ha dado a cancelar
+        }
+    
+    
+    }//GEN-LAST:event_GuardarComoMousePressed
+
+    private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GuardarActionPerformed
+
+    private void GuardarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GuardarMousePressed
+        //Para guardar el archivo
+        
+        int seleccion = jFileChooser1.showSaveDialog(this);
+        if(seleccion == JFileChooser.APPROVE_OPTION){
+            //Si entro aqui es porque el usuario le ha dado a aceptar
+            
+            File fichero = jFileChooser1.getSelectedFile();
+            
+            //Cojo el nombre del archivo
+            String nombre = fichero.getName();
+           
+            //Busco la extension del archivo
+            String extension = nombre.substring(nombre.lastIndexOf('.')+1, nombre.length());
+            if(extension.equalsIgnoreCase("jpg")||extension.equalsIgnoreCase("png")){
+                try{
+                    //Aqui le digo que escriba el buffer con la extension que tenga
+                    ImageIO.write(buffer, extension, fichero);
+                }
+                catch(IOException e){ 
+                }
+            }
+        }
+        if(seleccion == JFileChooser.CANCEL_OPTION){
+            //si entro aqui es porque el usuario le ha dado a cancelar
+        }
+    }//GEN-LAST:event_GuardarMousePressed
+
+    private void SalirMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SalirMousePressed
+        jDialog7.setVisible(true);
+    }//GEN-LAST:event_SalirMousePressed
+
+    private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton32ActionPerformed
+
+    private void jButton32MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton32MousePressed
+        //Aceptar
+        //Para guardar el archivo
+       
+        int seleccion = jFileChooser1.showSaveDialog(this);
+        if(seleccion == JFileChooser.APPROVE_OPTION){
+            //Si entro aqui es porque el usuario le ha dado a aceptar
+            
+            File fichero = jFileChooser1.getSelectedFile();
+            
+            //Cojo el nombre del archivo
+            String nombre = fichero.getName();
+           
+            //Busco la extension del archivo
+            String extension = nombre.substring(nombre.lastIndexOf('.')+1, nombre.length());
+            if(extension.equalsIgnoreCase("jpg")||extension.equalsIgnoreCase("png")){
+                try{
+                    //Aqui le digo que escriba el buffer con la extension que tenga
+                    ImageIO.write(buffer, extension, fichero);
+                }
+                catch(IOException e){ 
+                }
+            }
+        }
+        if(seleccion == JFileChooser.CANCEL_OPTION){
+            //si entro aqui es porque el usuario le ha dado a cancelar
+        }
+        jDialog7.setVisible(false);
+    }//GEN-LAST:event_jButton32MousePressed
+
+    private void jButton33MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton33MousePressed
+        //Cancelar
+        jDialog7.setVisible(false);
+    }//GEN-LAST:event_jButton33MousePressed
+
+    private void jButton34MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton34MousePressed
+        //Salir
+        System.exit(0);
+    }//GEN-LAST:event_jButton34MousePressed
+
+    private void jButton35MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton35MousePressed
+        //Triangulo irregular
+        numLados = 8;
+        colorSeleccionado = jTextField1.getBackground();
+        relleno = true;
+        lapiz = false;
+    }//GEN-LAST:event_jButton35MousePressed
 
     /**
      * @param args the command line arguments
@@ -1009,6 +1574,13 @@ public class VentanaPaint extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu Archivo;
+    private javax.swing.JMenu Formas;
+    private javax.swing.JMenuItem Guardar;
+    private javax.swing.JMenuItem GuardarComo;
+    private javax.swing.JMenuItem Salir;
+    private javax.swing.JLabel grosorPuntero;
+    private javax.swing.JLabel grosorPuntero1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
@@ -1028,7 +1600,16 @@ public class VentanaPaint extends javax.swing.JFrame {
     private javax.swing.JButton jButton24;
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
+    private javax.swing.JButton jButton27;
+    private javax.swing.JButton jButton28;
+    private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton30;
+    private javax.swing.JButton jButton31;
+    private javax.swing.JButton jButton32;
+    private javax.swing.JButton jButton33;
+    private javax.swing.JButton jButton34;
+    private javax.swing.JButton jButton35;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
@@ -1041,12 +1622,23 @@ public class VentanaPaint extends javax.swing.JFrame {
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JDialog jDialog3;
+    private javax.swing.JDialog jDialog4;
+    private javax.swing.JDialog jDialog5;
+    private javax.swing.JDialog jDialog6;
+    private javax.swing.JDialog jDialog7;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JSlider jSlider2;
+    private javax.swing.JSlider jSlider3;
+    private javax.swing.JSlider jSlider4;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JPanel lienzo;
     // End of variables declaration//GEN-END:variables
